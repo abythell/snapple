@@ -12,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.3.1",
+    "json-rpc-2.0": "^1.7.0"
+  },
+  "optionalDependencies": {
     "johnny-five": "^2.1.0",
-    "json-rpc-2.0": "^1.7.0",
     "raspi-io": "^11.0.0"
   },
   "devDependencies": {
