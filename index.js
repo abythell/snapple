@@ -14,18 +14,18 @@ board.on('ready', () => {
 
   snap.on('data', (metadata) => {
     try {
-    	lcd.setTitle(metadata.title)
+      lcd.setTitle(metadata.title)
     } catch (err) {
-	   console.error(err) 
+      console.error(err)
     }
   })
 
   snap.on('status', (status) => {
-	  try {
-   		lcd.setStatus(status)
-	  } catch (err) {
-		  console.error(err)
-	  }
+    try {
+      lcd.setStatus(status)
+    } catch (err) {
+      console.error(err)
+    }
   })
 
   snap.open().then(() => {
@@ -38,5 +38,3 @@ board.on('ready', () => {
     }).catch(console.err)
   })
 })
-
-
