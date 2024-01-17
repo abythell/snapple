@@ -2,21 +2,26 @@ const SnapMeta = require('./lib/snap-meta.js')
 const Raspi = require('raspi-io').RaspiIO
 const j5 = require('johnny-five')
 const LCD = require('./lib/lcd.js')
+const Amp = require('./lib/amp.js')
 
-require('dotenv').config() // eslint-disable-line no-unused-expressions
+require('dotenv').config()
 const board = new j5.Board({ io: new Raspi(), repl: false })
+const lcd = new LCD()
+const amp = new Amp(board)
+const snap = new SnapMeta(process.env.SNAPSERVER)
 
 board.on('ready', () => {
-  const lcd = new LCD(j5)
-  const snap = new SnapMeta(process.env.SNAPSERVER)
+  lcd.begin()
+  amp.begin()
 
-  snap.on('error', console.error)
+  snap.on('error', errorHandler)
 
   snap.on('data', (metadata) => {
     try {
       lcd.setTitle(metadata.title)
     } catch (err) {
-      console.error(err)
+      // call our own error handler, instead of letting JSON-RPC handle it
+      errorHandler(err)
     }
   })
 
@@ -24,17 +29,29 @@ board.on('ready', () => {
     try {
       lcd.setStatus(status)
     } catch (err) {
-      console.error(err)
+      // call our own error handler, instead of letting JSON-RPC handle it
+      errorHandler(err)
     }
   })
 
   snap.open().then(() => {
     lcd.setStatus('starting')
-  }).catch(console.err)
+  }).catch(errorHandler)
 
   process.on('SIGINT', () => {
+    lcd.clear()
     snap.close().then(() => {
       process.exit(0)
-    }).catch(console.err)
+    }).catch(errorHandler)
   })
+
+  function errorHandler (err) {
+    console.error(err)
+    try {
+      lcd.setStatus('error')
+      lcd.setTitle(err.message)
+    } catch (err) {
+      console.error(err)
+    }
+  }
 })
