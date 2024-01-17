@@ -1,11 +1,11 @@
 const SnapMeta = require('./lib/snap-meta.js')
 const Raspi = require('raspi-io').RaspiIO
-const j5 = require('johnny-five')
+const five = require('johnny-five')
 const LCD = require('./lib/lcd.js')
 const Amp = require('./lib/amp.js')
 
 require('dotenv').config()
-const board = new j5.Board({ io: new Raspi(), repl: false })
+const board = new five.Board({ io: new Raspi(), repl: false })
 const lcd = new LCD()
 const amp = new Amp(board)
 const snap = new SnapMeta(process.env.SNAPSERVER)
@@ -13,9 +13,7 @@ const snap = new SnapMeta(process.env.SNAPSERVER)
 board.on('ready', () => {
   lcd.begin()
   amp.begin()
-
   snap.on('error', errorHandler)
-
   snap.on('data', (metadata) => {
     try {
       lcd.setTitle(metadata.title)
@@ -24,7 +22,6 @@ board.on('ready', () => {
       errorHandler(err)
     }
   })
-
   snap.on('status', (status) => {
     try {
       lcd.setStatus(status)
@@ -33,7 +30,6 @@ board.on('ready', () => {
       errorHandler(err)
     }
   })
-
   snap.open().then(() => {
     lcd.setStatus('starting')
   }).catch(errorHandler)

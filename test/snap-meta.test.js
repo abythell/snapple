@@ -189,7 +189,6 @@ describe('SnapMeta', () => {
     beforeEach((done) => {
       snap.host = 'localhost'
       snap.port = 8080
-      jest.spyOn(snap.socket, 'destroy')
       server = net.createServer()
       server.listen(8080, done)
     })
@@ -197,9 +196,10 @@ describe('SnapMeta', () => {
       server.close(done)
     })
     it('closes a socket', async () => {
+      jest.spyOn(snap.socket, 'end')
       await snap.open()
       await snap.close()
-      expect(snap.socket.destroy).toHaveBeenCalled()
+      expect(snap.socket.end).toHaveBeenCalled()
     })
   })
 })
