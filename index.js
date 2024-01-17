@@ -3,7 +3,7 @@ const Raspi = require('raspi-io').RaspiIO
 const j5 = require('johnny-five')
 const LCD = require('./lib/lcd.js')
 
-require('dotenv').config // eslint-disable-line no-unused-expressions
+require('dotenv').config() // eslint-disable-line no-unused-expressions
 const board = new j5.Board({ io: new Raspi(), repl: false })
 
 board.on('ready', () => {
@@ -13,13 +13,23 @@ board.on('ready', () => {
   snap.on('error', console.error)
 
   snap.on('data', (metadata) => {
-    lcd.title(metadata.title)
+    try {
+    	lcd.setTitle(metadata.title)
+    } catch (err) {
+	   console.error(err) 
+    }
   })
 
-  snap.on('status', lcd.setStatus)
+  snap.on('status', (status) => {
+	  try {
+   		lcd.setStatus(status)
+	  } catch (err) {
+		  console.error(err)
+	  }
+  })
 
   snap.open().then(() => {
-    lcd.setTitle('Starting')
+    lcd.setStatus('starting')
   }).catch(console.err)
 
   process.on('SIGINT', () => {
